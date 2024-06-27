@@ -1,0 +1,37 @@
+name: app_p_70
+description: A new Flutter project.
+version: 1.0.0+1
+environment: 
+  sdk: '>=3.2.2 <4.0.0'
+dependencies: 
+  flutter: 
+    sdk: flutter
+  flutter_localizations: 
+    sdk: flutter
+  cached_network_image: ^3.3.0
+  flutter_svg: ^2.0.9
+  flutter_svg_provider: ^1.0.7
+  connectivity_plus: ^5.0.2
+dev_dependencies: 
+  flutter_test: 
+    sdk: flutter
+flutter: 
+  uses-material-design: true
+  assets: 
+    - assets/
+    - assets/images/
+  fonts: 
+    - family: Architects Daughter
+      fonts: 
+        - asset: assets/fonts/ArchitectsDaughterRegular.ttf
+          weight: 400
+    - family: Roboto
+      fonts: 
+        - asset: assets/fonts/RobotoRegular.ttf
+          weight: 400
+        - asset: assets/fonts/RobotoRomanBold.ttf
+          weight: 700
+    - family: Kharkiv Tone
+      fonts: 
+        - asset: assets/fonts/KharkivToneRegular.ttf
+          weight: 400
