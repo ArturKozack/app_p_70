@@ -1,59 +1,56 @@
 import 'package:flutter/material.dart';
-import '../../core/app_export.dart';
+import 'package:app_p_70/core/app_export.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class StartTrainingDialog extends StatelessWidget {
-  const StartTrainingDialog({Key? key})
-      : super(
-          key: key,
-        );
+  final Function() onStartTraining;
+
+  const StartTrainingDialog({
+    Key? key,
+    required this.onStartTraining,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.transparent,
-      child: Center(
-          child: Container(
+    final localization =AppLocalizations.of(context)!;
+
+    return AlertDialog(
+      backgroundColor: appTheme.gray5001,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadiusStyle.roundedBorder10,
+      ),
+      title: SizedBox(
         width: double.maxFinite,
-        padding: EdgeInsets.symmetric(horizontal: 30.h),
-        child: Column(
-          children: [
-            Container(
-              width: double.maxFinite,
-              padding: EdgeInsets.all(24.h),
-              decoration: AppDecoration.backgroundBackground1.copyWith(
-                borderRadius: BorderRadiusStyle.roundedBorder10,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Notification".toUpperCase(),
-                    style: CustomTextStyles.titleLargePrimaryContainer_1,
-                  ),
-                  SizedBox(height: 20.v),
-                  Text(
-                    "It's time to start training!",
-                    style: CustomTextStyles.bodySmallSecondaryContainer,
-                  ),
-                  SizedBox(height: 34.v),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: Padding(
-                      padding: EdgeInsets.only(right: 12.h),
-                      child: Text(
-                        "Start",
-                        style: theme.textTheme.bodyLarge,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 12.v)
-                ],
-              ),
-            )
-          ],
+        child: Text(
+          localization.notification.toUpperCase(),
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: CustomTextStyles.titleLargePrimaryContainer_1.copyWith(
+            height: 1.27,
+          ),
         ),
-      )),
+      ),
+      content: Text(
+        localization.timeToStartTraining,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
+        style: CustomTextStyles.bodySmallSecondaryContainer.copyWith(
+          height: 1.33,
+        ),
+      ),
+      actionsAlignment: MainAxisAlignment.end,
+      actions: [
+        InkWell(
+          onTap: () {
+            Navigator.pop(context);
+            onStartTraining();
+          },
+          child: Text(
+            localization.start,
+            style: theme.textTheme.bodyLarge,
+          ),
+        ),
+      ],
     );
   }
 }

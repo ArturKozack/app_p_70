@@ -13,4 +13,6 @@ extension DateTimeExtension on DateTime {
     }
     return DateFormat(pattern, locale).format(this);
   }
+
+  DateTime get onlyDate => DateTime(this.year, this.month, this.day);
 }

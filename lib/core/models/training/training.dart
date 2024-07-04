@@ -47,7 +47,7 @@ class TrainingModel {
 
   String get formattedDate {
     DateFormat dateFormat = DateFormat('dd.MM.yyyy');
-    return DayType.values[date.weekday].name.capitalized +
+    return DayType.values[date.weekday].title.capitalized +
         ' ' +
         dateFormat.format(date);
   }

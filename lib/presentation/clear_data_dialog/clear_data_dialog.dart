@@ -1,5 +1,6 @@
 import 'package:app_p_70/core/utils/app_strings.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:app_p_70/core/app_export.dart';
 
 class ClearDataDialog extends StatelessWidget {
@@ -7,6 +8,8 @@ class ClearDataDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return AlertDialog(
       backgroundColor: appTheme.gray5001,
       shape: RoundedRectangleBorder(
@@ -15,7 +18,7 @@ class ClearDataDialog extends StatelessWidget {
       title: SizedBox(
         width: double.maxFinite,
         child: Text(
-          "Delete all app cache?".toUpperCase(),
+          localizations.deleteAllAppCache.toUpperCase(),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: CustomTextStyles.titleLargePrimaryContainer_1.copyWith(
@@ -24,7 +27,7 @@ class ClearDataDialog extends StatelessWidget {
         ),
       ),
       content: Text(
-        "All your data will be lost,\nbeyond recovery",
+        localizations.deleteAppCacheWarning,
         maxLines: 2,
         overflow: TextOverflow.ellipsis,
         style: CustomTextStyles.bodySmallSecondaryContainer.copyWith(
@@ -36,7 +39,7 @@ class ClearDataDialog extends StatelessWidget {
         InkWell(
           onTap: () => Navigator.pop(context, AppStrings.cancel),
           child: Text(
-            "Cancel",
+            localizations.cancel,
             style: theme.textTheme.bodyLarge,
           ),
         ),
@@ -45,7 +48,7 @@ class ClearDataDialog extends StatelessWidget {
           child: Padding(
             padding: EdgeInsets.only(left: 32.h),
             child: Text(
-              "Delete",
+              localizations.delete,
               style: theme.textTheme.bodyLarge,
             ),
           ),

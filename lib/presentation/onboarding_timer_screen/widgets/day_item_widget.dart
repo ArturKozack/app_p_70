@@ -1,4 +1,5 @@
 import 'package:app_p_70/core/models/day_type/day_type.dart';
+import 'package:app_p_70/core/utils/extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:app_p_70/core/app_export.dart';
 
@@ -24,9 +25,11 @@ class DayTypeWidget extends StatelessWidget {
       showCheckmark: false,
       labelPadding: EdgeInsets.zero,
       label: Text(
-        dayType.toString(),
+        dayType.title,
         style: TextStyle(
-          color: theme.colorScheme.onPrimary.withOpacity(1),
+          color: isSelected
+              ? appTheme.whiteA700
+              : theme.colorScheme.onPrimary.withOpacity(1),
           fontSize: 12.fSize,
           fontFamily: 'Kharkiv Tone',
           fontWeight: FontWeight.w400,
@@ -35,11 +38,13 @@ class DayTypeWidget extends StatelessWidget {
       selected: isSelected,
       backgroundColor: appTheme.whiteA700,
       shadowColor: appTheme.black90026,
-      elevation: 6,
+      elevation: 2,
       selectedColor: theme.colorScheme.onPrimaryContainer,
       shape: RoundedRectangleBorder(
         side: BorderSide(
-          color: appTheme.gray5001,
+          color: isSelected
+              ? theme.colorScheme.onPrimaryContainer
+              : appTheme.gray5001,
           width: 0,
         ),
         borderRadius: BorderRadius.circular(

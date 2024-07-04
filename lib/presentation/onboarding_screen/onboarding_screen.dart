@@ -1,4 +1,5 @@
 import 'package:app_p_70/presentation/widgets/app_button.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:app_p_70/core/app_export.dart';
 import 'package:app_p_70/widgets/app_bar/appbar_subtitle.dart';
@@ -19,21 +20,18 @@ class OnboardingScreen extends StatelessWidget {
             horizontal: 20.h,
             vertical: 24.v,
           ),
-          child: Column(
-            children: [_buildTitleSection(context), SizedBox(height: 4.v)],
-          ),
+          child: _buildBody(context),
         ),
       ),
     );
   }
 
-  /// Section Widget
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return CustomAppBar(
       height: 90.v,
       actions: [
         AppbarSubtitle(
-          text: "Skip",
+          text: AppLocalizations.of(context)!.skip,
           margin: EdgeInsets.only(
             top: 18.v,
             right: 36.h,
@@ -44,21 +42,22 @@ class OnboardingScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
-  Widget _buildOnboardingCard(BuildContext context) {
+  Widget _buildBody(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return SizedBox(
       width: double.maxFinite,
       child: Column(
         children: [
           Text(
-            "Training credit",
+            localizations.trainingCredit,
             style: theme.textTheme.displaySmall,
           ),
           SizedBox(height: 22.v),
           SizedBox(
             width: double.maxFinite,
             child: Text(
-              "Reminders and recording of training in your smartphone",
+              localizations.remindersAndRecording,
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
@@ -75,20 +74,11 @@ class OnboardingScreen extends StatelessWidget {
           ),
           SizedBox(height: 22.v),
           AppButton(
+            title: localizations.next,
             onTap: () =>
                 Navigator.pushNamed(context, AppRoutes.onboardingTimerScreen),
           ),
         ],
-      ),
-    );
-  }
-
-  /// Section Widget
-  Widget _buildTitleSection(BuildContext context) {
-    return SizedBox(
-      width: double.maxFinite,
-      child: Column(
-        children: [_buildOnboardingCard(context)],
       ),
     );
   }

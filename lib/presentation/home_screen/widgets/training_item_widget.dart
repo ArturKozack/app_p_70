@@ -44,7 +44,9 @@ class TrainingItemWidget extends StatelessWidget {
             padding: EdgeInsets.only(top: 8.v),
             child: Text(
               training.points.toString(),
-              style: CustomTextStyles.bodyLargeLightgreen400,
+              style: training.isMissed
+                  ? CustomTextStyles.bodyLargeRed600
+                  : CustomTextStyles.bodyLargeLightgreen400,
             ),
           )
         ],

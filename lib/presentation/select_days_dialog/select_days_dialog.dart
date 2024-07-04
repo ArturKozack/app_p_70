@@ -34,7 +34,7 @@ class SelectDaysDialog extends StatelessWidget {
       actions: [
         InkWell(
           onTap: () =>
-              Navigator.popAndPushNamed(context, AppRoutes.onboardingScreen),
+              Navigator.popAndPushNamed(context, AppRoutes.onboardingTimerScreen),
           child: Text(
             "Select Days",
             style: theme.textTheme.bodyLarge,

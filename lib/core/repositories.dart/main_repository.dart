@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:app_p_70/core/models/schedule/schedule.dart';
 import 'package:app_p_70/core/models/training/training.dart';
 import 'package:app_p_70/core/utils/app_strings.dart';
-import 'package:app_p_70/core/utils/extensions.dart';
+import 'package:app_p_70/core/utils/date_time_utils.dart';
 import 'package:app_p_70/presentation/clear_data_dialog/clear_data_dialog.dart';
 import 'package:app_p_70/routes/app_routes.dart';
 import 'package:app_p_70/widgets/custom_snack_bar.dart';
@@ -19,34 +19,53 @@ class MainRepository {
   static final trainingsBox = Hive.box<TrainingModel>('trainings');
 
   static ScheduleModel? get schedule => scheduleBox.values.firstOrNull;
+  static List<TrainingModel> trainings = trainingsBox.values.toList();
 
   static bool get isTimerActive => scheduleBox.isNotEmpty;
 
-  static bool checkForMissedTrainings()  {
+  static bool checkForMissedTrainings() {
     bool isTrainingMissed = false;
-    final trainings = trainingsBox.values.toList();
+    List<TrainingModel> missedTrainings = [];
 
-    if (schedule != null && isTimerActive && trainings.isNotEmpty) {
-      final DateTime now = DateTime.now().onlyDate;
-      DateTime lastDate = trainingsBox.values.last.date.onlyDate;
-      DateTime checkDate = lastDate.add(Duration(days: 1));
+    if (schedule != null && isTimerActive) {
+      final DateTime now = DateTime.now().add(Duration(days: 20)).onlyDate;
+      final DateTime lastDate =
+          trainings.isNotEmpty ? trainings.last.date : schedule!.startDate;
+      DateTime checkDate = lastDate.onlyDate.add(Duration(days: 1));
 
       while (checkDate.isBefore(now)) {
-        final scheduledDays = schedule!.days.map((e) => e.index);
-        if (scheduledDays.contains(lastDate.weekday)) {
-          final missedTraining = TrainingModel(
-            date: checkDate,
-            isMissed: true,
+        final scheduledDaysIndexes = schedule!.days.map((e) => e.index);
+        if (scheduledDaysIndexes.contains(checkDate.weekday)) {
+          missedTrainings.add(
+            TrainingModel(
+              date: checkDate,
+              isMissed: true,
+            ),
           );
-          addTraining(missedTraining);
-          checkDate.add(Duration(days: 1));
           if (!isTrainingMissed) isTrainingMissed = true;
-          continue;
         }
-        break;
+        checkDate = checkDate.add(Duration(days: 1));
       }
     }
+    trainingsBox.addAll(missedTrainings);
+
     return isTrainingMissed;
+  }
+
+  static bool checkForTodayTraining() {
+    if (schedule != null && isTimerActive) {
+      final DateTime now = DateTime.now().onlyDate;
+      final scheduledDaysIndexes = schedule!.days.map((e) => e.index);
+      if (scheduledDaysIndexes.contains(now.day)) {
+        if (trainings.isEmpty)
+          return true;
+        else {
+          final DateTime lastDate = trainings.last.date.onlyDate;
+          return !lastDate.isAtSameMomentAs(lastDate);
+        }
+      }
+    }
+    return false;
   }
 
   static void changeSchedule(ScheduleModel schedule) {
@@ -55,7 +74,7 @@ class MainRepository {
         .onError((error, stackTrace) => showErrorSnackbar());
   }
 
-  static void addTraining(TrainingModel training) {
+  static void addTraining(TrainingModel training) async {
     trainingsBox
         .add(training)
         .then((_) => showSuccessSnackbar(AppStrings.trainingSavedSuccessfully))

@@ -5,8 +5,10 @@ import 'package:app_p_70/presentation/home_screen/widgets/training_item_widget.d
 import 'package:app_p_70/presentation/missed_workout_dialog/missed_workout_dialog.dart';
 import 'package:app_p_70/presentation/onboarding_timer_screen/widgets/day_item_widget.dart';
 import 'package:app_p_70/presentation/select_days_dialog/select_days_dialog.dart';
+import 'package:app_p_70/presentation/start_training_dialog/start_training_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as fs;
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:app_p_70/core/app_export.dart';
 import 'package:app_p_70/widgets/app_bar/appbar_title.dart';
 import 'package:app_p_70/widgets/app_bar/appbar_trailing_image.dart';
@@ -32,20 +34,39 @@ class _HomeScreenState extends State<HomeScreen> {
   DayType _selectedDayType = DayType.all;
   final List<DayType> _scheduledDays = MainRepository.schedule?.days ?? [];
 
+  late AppLocalizations localizations;
+
   @override
   void initState() {
     bool isTrainingMissed = MainRepository.checkForMissedTrainings();
-    if (isTrainingMissed) {
-      WidgetsBinding.instance.addPostFrameCallback(
-        (_) => showDialog<String>(
-          context: context,
-          builder: (_) => const MissedWorkoutDialog(),
-        ),
-      );
+    bool isUnfinishedTrainingToday = MainRepository.checkForTodayTraining();
+
+    if (isTrainingMissed || isUnfinishedTrainingToday) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (isTrainingMissed)
+          showDialog<String>(
+            context: context,
+            builder: (_) => const MissedWorkoutDialog(),
+          );
+        if (isUnfinishedTrainingToday)
+          showDialog<String>(
+            context: context,
+            builder: (_) => StartTrainingDialog(
+              onStartTraining: _handleTimerTap,
+            ),
+          );
+      });
     }
+
     if (_scheduledDays.isNotEmpty && !_scheduledDays.contains(DayType.all))
       _scheduledDays.insert(0, DayType.all);
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    localizations = AppLocalizations.of(context)!;
+    super.didChangeDependencies();
   }
 
   @override
@@ -75,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return CustomAppBar(
       centerTitle: true,
       title: AppbarTitle(
-        text: "Home".toUpperCase(),
+        text: localizations.home.toUpperCase(),
       ),
       actions: [
         AppbarTrailingImage(
@@ -110,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               SizedBox(height: 14.v),
               CustomElevatedButton(
-                text: "Training credit",
+                text: localizations.trainingCredit,
                 margin: EdgeInsets.symmetric(horizontal: 24.h),
               ),
               SizedBox(height: 48.v),
@@ -127,7 +148,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   mainAxisSize: MainAxisSize.max,
                   children: [
                     Text(
-                      "Balance $balance",
+                      '${localizations.balance} $balance',
                       style: theme.textTheme.headlineSmall,
                     ),
                   ],
@@ -170,10 +191,12 @@ class _HomeScreenState extends State<HomeScreen> {
           _buildTrainingSection(balance),
           SizedBox(height: 24.v),
           _buildDayFilterPanel(),
-          SizedBox(height: 24.v),
-          MainRepository.isTimerActive
-              ? _buildTrainingList(trainings)
-              : _noData()
+          SizedBox(height: 10.v),
+          Flexible(
+            child: MainRepository.isTimerActive
+                ? _buildTrainingList(trainings)
+                : _noData(),
+          )
         ],
       ),
     );
@@ -189,7 +212,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return SizedBox(
       width: double.maxFinite,
       child: ListView.separated(
-        physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         separatorBuilder: (context, index) {
           return SizedBox(
@@ -210,7 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return SizedBox(
       width: double.maxFinite,
       child: Text(
-        "Choose the days for training in the settings and start recording the time",
+        localizations.chooseTheDaysForTraining,
         maxLines: 4,
         overflow: TextOverflow.ellipsis,
         textAlign: TextAlign.center,

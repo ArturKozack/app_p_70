@@ -2,6 +2,7 @@ import 'package:app_p_70/core/utils/app_strings.dart';
 import 'package:app_p_70/core/repositories.dart/main_repository.dart';
 import 'package:app_p_70/presentation/settings_screen/info_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 enum SettingsItemType {
@@ -14,17 +15,20 @@ enum SettingsItemType {
 
 extension SettingsItemValue on SettingsItemType {
   String get title {
+    final context = MainRepository.snackbarKey.currentContext!;
+    final localizations = AppLocalizations.of(context)!;
+
     switch (this) {
       case SettingsItemType.notifications:
-        return 'Notifications';
+        return localizations.notification;
       case SettingsItemType.privacyPolicy:
-        return 'Privacy Policy';
+        return localizations.privacyPolicy;
       case SettingsItemType.shareApp:
-        return 'Share app';
+        return localizations.shareApp;
       case SettingsItemType.termsOfUse:
-        return 'Terms of Use';
+        return localizations.termsOfUse;
       case SettingsItemType.clearCache:
-        return 'Clear data';
+        return localizations.clearData;
     }
   }
 

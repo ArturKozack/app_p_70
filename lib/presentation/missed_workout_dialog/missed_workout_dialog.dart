@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:app_p_70/core/app_export.dart';
 
 class MissedWorkoutDialog extends StatelessWidget {
@@ -6,6 +7,8 @@ class MissedWorkoutDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return AlertDialog(
       backgroundColor: appTheme.gray5001,
       shape: RoundedRectangleBorder(
@@ -14,7 +17,7 @@ class MissedWorkoutDialog extends StatelessWidget {
       title: SizedBox(
         width: double.maxFinite,
         child: Text(
-          "Notification".toUpperCase(),
+          localizations.notification.toUpperCase(),
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
           style: CustomTextStyles.titleLargePrimaryContainer_1.copyWith(
@@ -23,7 +26,7 @@ class MissedWorkoutDialog extends StatelessWidget {
         ),
       ),
       content: Text(
-        "You missed a scheduled workout. You will be credited with 60 points.",
+        localizations.missedWorkoutWarning,
         maxLines: 3,
         overflow: TextOverflow.ellipsis,
         style: CustomTextStyles.bodySmallSecondaryContainer.copyWith(
@@ -35,7 +38,7 @@ class MissedWorkoutDialog extends StatelessWidget {
         InkWell(
           onTap: () => Navigator.pop(context),
           child: Text(
-            "Cancel",
+            localizations.cancel,
             style: theme.textTheme.bodyLarge,
           ),
         ),

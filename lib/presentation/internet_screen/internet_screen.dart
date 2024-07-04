@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../core/app_export.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:app_p_70/core/app_export.dart';
 
 class InternetScreen extends StatelessWidget {
-  const InternetScreen({Key? key})
-      : super(
-          key: key,
-        );
+  const InternetScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -42,8 +40,9 @@ class InternetScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
   Widget _buildConnectionErrorMessage(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+
     return Container(
       width: double.maxFinite,
       padding: EdgeInsets.symmetric(horizontal: 30.h),
@@ -66,7 +65,7 @@ class InternetScreen extends StatelessWidget {
                   text: TextSpan(
                     children: [
                       TextSpan(
-                        text: "Looks like you lost internet connection."
+                        text: localizations.looksLikeYouLostInternetConnection
                             .toUpperCase(),
                         style: CustomTextStyles.titleLargePrimaryContainer,
                       ),
@@ -76,7 +75,7 @@ class InternetScreen extends StatelessWidget {
                             CustomTextStyles.titleLargeRobotoPrimaryContainer,
                       ),
                       TextSpan(
-                        text: "Try again later",
+                        text: localizations.tryAgainLater,
                         style: CustomTextStyles.bodyLargeOnPrimaryContainer,
                       )
                     ],

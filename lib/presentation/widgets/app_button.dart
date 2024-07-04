@@ -9,7 +9,7 @@ class AppButton extends StatelessWidget {
 
   const AppButton({
     super.key,
-    this.title = 'Next',
+    required this.title,
     this.isActive = true,
     required this.onTap,
   });

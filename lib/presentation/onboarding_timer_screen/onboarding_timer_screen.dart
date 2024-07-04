@@ -3,6 +3,7 @@ import 'package:app_p_70/core/models/schedule/schedule.dart';
 import 'package:app_p_70/core/repositories.dart/main_repository.dart';
 import 'package:app_p_70/presentation/widgets/app_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:app_p_70/core/app_export.dart';
 import 'package:app_p_70/widgets/app_bar/appbar_subtitle.dart';
 import 'package:app_p_70/widgets/app_bar/custom_app_bar.dart';
@@ -21,6 +22,14 @@ class _OnboardingTimerScreenState extends State<OnboardingTimerScreen> {
 
   final List<DayType> _selectedDays = [];
   TimeOfDay _selectedTime = TimeOfDay(hour: 0, minute: 0);
+
+  late AppLocalizations localizations;
+
+  @override
+  void didChangeDependencies() {
+    localizations = AppLocalizations.of(context)!;
+    super.didChangeDependencies();
+  }
 
   @override
   void dispose() {
@@ -56,7 +65,7 @@ class _OnboardingTimerScreenState extends State<OnboardingTimerScreen> {
       height: 90.v,
       actions: [
         AppbarSubtitle(
-          text: "Skip",
+          text: localizations.skip,
           margin: EdgeInsets.only(
             top: 18.v,
             right: 36.h,
@@ -72,14 +81,14 @@ class _OnboardingTimerScreenState extends State<OnboardingTimerScreen> {
       child: Column(
         children: [
           Text(
-            "Training credit",
+            localizations.trainingCredit,
             style: theme.textTheme.displaySmall,
           ),
           SizedBox(height: 50.v),
           SizedBox(
             width: double.maxFinite,
             child: Text(
-              "Choose your days for sports",
+              localizations.chooseYourDaysForSports,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
@@ -126,7 +135,7 @@ class _OnboardingTimerScreenState extends State<OnboardingTimerScreen> {
           SizedBox(
             width: double.maxFinite,
             child: Text(
-              "Choose a time to do sports",
+              localizations.chooseTimeToDoSports,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
@@ -139,6 +148,7 @@ class _OnboardingTimerScreenState extends State<OnboardingTimerScreen> {
           _buildTimeInputWidget(),
           Spacer(),
           AppButton(
+            title: localizations.next,
             isActive: _selectedDays.isNotEmpty,
             onTap: () {
               if (_selectedDays.isNotEmpty) {
@@ -148,9 +158,16 @@ class _OnboardingTimerScreenState extends State<OnboardingTimerScreen> {
                 } else {
                   _selectedDays.sort((a, b) => a.index.compareTo(b.index));
                 }
+                final now = DateTime.now();
                 final schedule = ScheduleModel(
                   days: _selectedDays,
-                  startDate: DateTime.now(),
+                  startDate: DateTime(
+                    now.year,
+                    now.month,
+                    now.day,
+                    _selectedTime.hour,
+                    _selectedTime.minute,
+                  ),
                 );
                 MainRepository.changeSchedule(schedule);
                 Navigator.pushNamedAndRemoveUntil(
@@ -199,7 +216,7 @@ class _OnboardingTimerScreenState extends State<OnboardingTimerScreen> {
             Expanded(
               child: _buildTimeInputField(
                 _hoursController,
-                'hours',
+                localizations.hours,
               ),
             ),
             Padding(
@@ -212,7 +229,7 @@ class _OnboardingTimerScreenState extends State<OnboardingTimerScreen> {
             Expanded(
               child: _buildTimeInputField(
                 _minutesController,
-                'minutes',
+                localizations.minutes,
               ),
             ),
           ],
