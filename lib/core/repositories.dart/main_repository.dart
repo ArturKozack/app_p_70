@@ -28,7 +28,7 @@ class MainRepository {
     List<TrainingModel> missedTrainings = [];
 
     if (schedule != null && isTimerActive) {
-      final DateTime now = DateTime.now().add(Duration(days: 20)).onlyDate;
+      final DateTime now = DateTime.now().onlyDate;
       final DateTime lastDate =
           trainings.isNotEmpty ? trainings.last.date : schedule!.startDate;
       DateTime checkDate = lastDate.onlyDate.add(Duration(days: 1));

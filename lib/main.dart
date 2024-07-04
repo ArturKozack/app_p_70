@@ -6,6 +6,7 @@ import 'package:app_p_70/core/repositories.dart/main_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:notification_permissions/notification_permissions.dart';
@@ -49,6 +50,7 @@ class MyApp extends StatelessWidget {
               : AppRoutes.onboardingScreen,
           routes: AppRoutes.routes,
           localizationsDelegates: [
+            AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
@@ -57,7 +59,7 @@ class MyApp extends StatelessWidget {
             Locale('en'),
           ],
           scaffoldMessengerKey: MainRepository.snackbarKey,
-          
+
         );
       },
     );

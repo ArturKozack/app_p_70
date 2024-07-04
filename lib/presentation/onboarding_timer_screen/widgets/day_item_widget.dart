@@ -25,7 +25,7 @@ class DayTypeWidget extends StatelessWidget {
       showCheckmark: false,
       labelPadding: EdgeInsets.zero,
       label: Text(
-        dayType.title,
+        dayType.title.capitalized,
         style: TextStyle(
           color: isSelected
               ? appTheme.whiteA700
