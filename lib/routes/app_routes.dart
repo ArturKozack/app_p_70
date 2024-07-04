@@ -4,7 +4,6 @@ import '../presentation/internet_screen/internet_screen.dart';
 import '../presentation/onboarding_screen/onboarding_screen.dart';
 import '../presentation/onboarding_timer_screen/onboarding_timer_screen.dart';
 import '../presentation/preloader_screen/preloader_screen.dart';
-import '../presentation/privacy_policy_screen/privacy_policy_screen.dart';
 import '../presentation/settings_screen/settings_screen.dart';
 
 class AppRoutes {
@@ -18,8 +17,6 @@ class AppRoutes {
 
   static const String settingsScreen = '/settings_screen';
 
-  static const String privacyPolicyScreen = '/privacy_policy_screen';
-
   static const String internetScreen = '/internet_screen';
 
   static const String appNavigationScreen = '/app_navigation_screen';
@@ -31,7 +28,6 @@ class AppRoutes {
     onboardingTimerScreen: (context) => OnboardingTimerScreen(),
     homeScreen: (context) => HomeScreen(),
     settingsScreen: (context) => SettingsScreen(),
-    privacyPolicyScreen: (context) => PrivacyPolicyScreen(),
     internetScreen: (context) => InternetScreen(),
     initialRoute: (context) => PreloaderScreen()
   };

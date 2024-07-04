@@ -1,15 +1,15 @@
+import 'package:app_p_70/core/repositories.dart/main_repository.dart';
+import 'package:app_p_70/core/utils/settings_utils.dart';
+import 'package:app_p_70/presentation/settings_screen/widgets/settings_item_widget.dart';
+import 'package:app_p_70/presentation/widgets/app_button.dart';
 import 'package:flutter/material.dart';
-import '../../core/app_export.dart';
-import '../../widgets/app_bar/appbar_leading_image.dart';
-import '../../widgets/app_bar/appbar_title.dart';
-import '../../widgets/app_bar/custom_app_bar.dart';
-import 'widgets/settingslist_item_widget.dart';
+import 'package:app_p_70/core/app_export.dart';
+import 'package:app_p_70/widgets/app_bar/appbar_leading_image.dart';
+import 'package:app_p_70/widgets/app_bar/appbar_title.dart';
+import 'package:app_p_70/widgets/app_bar/custom_app_bar.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({Key? key})
-      : super(
-          key: key,
-        );
+  const SettingsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,14 +21,22 @@ class SettingsScreen extends StatelessWidget {
           width: double.maxFinite,
           padding: EdgeInsets.all(20.h),
           child: Column(
-            children: [_buildSettingsColumn(context), SizedBox(height: 4.v)],
+            children: [
+              _buildSettingsItemList(context),
+              SizedBox(height: 24.v),
+              if (!MainRepository.isTimerActive)
+                AppButton(
+                  title: 'Select Days',
+                  onTap: () =>
+                      Navigator.pushNamed(context, AppRoutes.onboardingScreen),
+                ),
+            ],
           ),
         ),
       ),
     );
   }
 
-  /// Section Widget
   PreferredSizeWidget _buildAppBar(BuildContext context) {
     return CustomAppBar(
       leadingWidth: 40.h,
@@ -39,9 +47,7 @@ class SettingsScreen extends StatelessWidget {
           top: 20.v,
           bottom: 20.v,
         ),
-        onTap: () {
-          onTapArrowleftone(context);
-        },
+        onTap: () => Navigator.pop(context),
       ),
       centerTitle: true,
       title: AppbarTitle(
@@ -51,8 +57,7 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
-  Widget _buildSettingsList(BuildContext context) {
+  Widget _buildSettingsItemList(BuildContext context) {
     return SizedBox(
       width: double.maxFinite,
       child: ListView.separated(
@@ -63,26 +68,13 @@ class SettingsScreen extends StatelessWidget {
             height: 12.v,
           );
         },
-        itemCount: 6,
+        itemCount: SettingsItemType.values.length,
         itemBuilder: (context, index) {
-          return SettingslistItemWidget();
+          return SettingsItemWidget(
+            settingsItem: SettingsItemType.values[index],
+          );
         },
       ),
     );
-  }
-
-  /// Section Widget
-  Widget _buildSettingsColumn(BuildContext context) {
-    return SizedBox(
-      width: double.maxFinite,
-      child: Column(
-        children: [_buildSettingsList(context)],
-      ),
-    );
-  }
-
-  /// Navigates back to the previous screen.
-  onTapArrowleftone(BuildContext context) {
-    Navigator.pop(context);
   }
 }

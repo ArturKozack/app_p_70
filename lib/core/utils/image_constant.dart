@@ -29,6 +29,8 @@ class ImageConstant {
 
   static String imgPlayCircle = '$imagePath/img_play_circle.svg';
 
+  static String imgPauseCircle = '$imagePath/img_pause_circle.svg';
+
   static String imgArrowLeft = '$imagePath/img_arrow_left.svg';
 
   static String imageNotFound = 'assets/images/image_not_found.png';

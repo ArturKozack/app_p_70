@@ -1,14 +1,11 @@
+import 'package:app_p_70/presentation/widgets/app_button.dart';
 import 'package:flutter/material.dart';
-import '../../core/app_export.dart';
-import '../../widgets/app_bar/appbar_subtitle.dart';
-import '../../widgets/app_bar/custom_app_bar.dart';
-import '../../widgets/custom_icon_button.dart';
+import 'package:app_p_70/core/app_export.dart';
+import 'package:app_p_70/widgets/app_bar/appbar_subtitle.dart';
+import 'package:app_p_70/widgets/app_bar/custom_app_bar.dart';
 
 class OnboardingScreen extends StatelessWidget {
-  const OnboardingScreen({Key? key})
-      : super(
-          key: key,
-        );
+  const OnboardingScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -77,48 +74,10 @@ class OnboardingScreen extends StatelessWidget {
             width: double.maxFinite,
           ),
           SizedBox(height: 22.v),
-          SizedBox(
-            height: 50.v,
-            width: double.maxFinite,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                CustomImageView(
-                  imagePath: ImageConstant.imgUnion,
-                  height: 50.v,
-                  width: double.maxFinite,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: 124.h,
-                          top: 8.v,
-                        ),
-                        child: Text(
-                          "Next",
-                          style: CustomTextStyles.bodyLargeGray50,
-                        ),
-                      ),
-                      CustomIconButton(
-                        height: 40.adaptSize,
-                        width: 40.adaptSize,
-                        padding: EdgeInsets.all(8.h),
-                        alignment: Alignment.center,
-                        child: CustomImageView(
-                          imagePath: ImageConstant.imgNorthEast,
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
-          )
+          AppButton(
+            onTap: () =>
+                Navigator.pushNamed(context, AppRoutes.onboardingTimerScreen),
+          ),
         ],
       ),
     );

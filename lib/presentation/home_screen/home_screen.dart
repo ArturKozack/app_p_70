@@ -1,41 +1,77 @@
-import 'package:app_p_70/presentation/home_screen/widgets/traininglist_item_widget.dart';
+import 'package:app_p_70/core/models/day_type/day_type.dart';
+import 'package:app_p_70/core/models/training/training.dart';
+import 'package:app_p_70/core/repositories.dart/main_repository.dart';
+import 'package:app_p_70/presentation/home_screen/widgets/training_item_widget.dart';
+import 'package:app_p_70/presentation/missed_workout_dialog/missed_workout_dialog.dart';
+import 'package:app_p_70/presentation/onboarding_timer_screen/widgets/day_item_widget.dart';
+import 'package:app_p_70/presentation/select_days_dialog/select_days_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg_provider/flutter_svg_provider.dart' as fs;
-import '../../core/app_export.dart';
-import '../../widgets/app_bar/appbar_title.dart';
-import '../../widgets/app_bar/appbar_trailing_image.dart';
-import '../../widgets/app_bar/custom_app_bar.dart';
-import '../../widgets/custom_elevated_button.dart';
-import '../../widgets/custom_icon_button.dart';
+import 'package:app_p_70/core/app_export.dart';
+import 'package:app_p_70/widgets/app_bar/appbar_title.dart';
+import 'package:app_p_70/widgets/app_bar/appbar_trailing_image.dart';
+import 'package:app_p_70/widgets/app_bar/custom_app_bar.dart';
+import 'package:app_p_70/widgets/custom_elevated_button.dart';
+import 'package:app_p_70/widgets/custom_icon_button.dart';
+import 'dart:async';
 
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key})
-      : super(
-          key: key,
-        );
+import 'package:hive_flutter/hive_flutter.dart';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  Timer? _timer;
+  int _seconds = 0;
+  bool _isRunning = false;
+
+  DayType _selectedDayType = DayType.all;
+  final List<DayType> _scheduledDays = MainRepository.schedule?.days ?? [];
+
+  @override
+  void initState() {
+    bool isTrainingMissed = MainRepository.checkForMissedTrainings();
+    if (isTrainingMissed) {
+      WidgetsBinding.instance.addPostFrameCallback(
+        (_) => showDialog<String>(
+          context: context,
+          builder: (_) => const MissedWorkoutDialog(),
+        ),
+      );
+    }
+    if (_scheduledDays.isNotEmpty && !_scheduledDays.contains(DayType.all))
+      _scheduledDays.insert(0, DayType.all);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         backgroundColor: appTheme.gray5001,
-        appBar: _buildAppBar(context),
-        body: Container(
-          width: double.maxFinite,
-          padding: EdgeInsets.all(20.h),
-          child: Column(
-            children: [
-              _buildInstructionSection(context),
-              SizedBox(height: 4.v)
-            ],
-          ),
+        appBar: _buildAppBar(),
+        body: ValueListenableBuilder(
+          valueListenable: MainRepository.trainingsBox.listenable(),
+          builder: (context, box, child) {
+            final trainings = box.values.toList();
+            return _buildBody(trainings);
+          },
         ),
       ),
     );
   }
 
-  /// Section Widget
-  PreferredSizeWidget _buildAppBar(BuildContext context) {
+  PreferredSizeWidget _buildAppBar() {
     return CustomAppBar(
       centerTitle: true,
       title: AppbarTitle(
@@ -49,83 +85,107 @@ class HomeScreen extends StatelessWidget {
             right: 14.h,
             bottom: 17.v,
           ),
+          onTap: () => Navigator.pushNamed(context, AppRoutes.settingsScreen),
         )
       ],
       styleType: Style.bgFill,
     );
   }
 
-  /// Section Widget
-  Widget _buildTrainingSection(BuildContext context) {
+  Widget _buildTrainingSection(int balance) {
     return Container(
-      width: double.maxFinite,
+      width: 380.h,
+      height: 278.v,
       decoration: BoxDecoration(
         image: DecorationImage(
           image: fs.Svg(
             ImageConstant.imgGroup12,
+            size: Size(380.h, 278.v),
           ),
-          fit: BoxFit.cover,
         ),
       ),
-      child: Column(
+      child: Stack(
         children: [
-          SizedBox(height: 14.v),
-          CustomElevatedButton(
-            text: "Training credit",
-            margin: EdgeInsets.symmetric(horizontal: 14.h),
-          ),
-          SizedBox(height: 48.v),
-          Text(
-            "00:00:00",
-            style: theme.textTheme.displayLarge,
-          ),
-          SizedBox(height: 48.v),
-          Container(
-            width: double.maxFinite,
-            margin: EdgeInsets.only(left: 14.h),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                Text(
-                  "Balance 0",
-                  style: theme.textTheme.headlineSmall,
+          Column(
+            children: [
+              SizedBox(height: 14.v),
+              CustomElevatedButton(
+                text: "Training credit",
+                margin: EdgeInsets.symmetric(horizontal: 24.h),
+              ),
+              SizedBox(height: 48.v),
+              Text(
+                _formatTime(_seconds),
+                style: theme.textTheme.displayLarge,
+              ),
+              SizedBox(height: 48.v),
+              Container(
+                width: double.maxFinite,
+                margin: EdgeInsets.only(left: 24.h),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisSize: MainAxisSize.max,
+                  children: [
+                    Text(
+                      "Balance $balance",
+                      style: theme.textTheme.headlineSmall,
+                    ),
+                  ],
                 ),
-                CustomIconButton(
-                  height: 74.adaptSize,
-                  width: 74.adaptSize,
-                  padding: EdgeInsets.all(16.h),
-                  decoration: IconButtonStyleHelper.fillOnError,
-                  child: CustomImageView(
-                    imagePath: ImageConstant.imgPlayCircle,
-                  ),
-                )
-              ],
+              )
+            ],
+          ),
+          Positioned(
+            right: 1,
+            bottom: 1,
+            child: CustomIconButton(
+              onTap: _handleTimerTap,
+              height: 74.adaptSize,
+              width: 74.adaptSize,
+              padding: EdgeInsets.all(16.h),
+              decoration: MainRepository.isTimerActive
+                  ? IconButtonStyleHelper.fillOnActive
+                  : IconButtonStyleHelper.fillOnError,
+              child: CustomImageView(
+                imagePath: _isRunning
+                    ? ImageConstant.imgPauseCircle
+                    : ImageConstant.imgPlayCircle,
+              ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  /// Section Widget
-  Widget _buildInstructionSection(BuildContext context) {
-    return SizedBox(
-      width: double.maxFinite,
+  Widget _buildBody(List<TrainingModel> trainings) {
+    final balance = trainings
+        .map((e) => e.points)
+        .fold(0, (previous, element) => previous + element);
+
+    return Padding(
+      padding: EdgeInsets.all(20.h),
       child: Column(
         children: [
-          _buildTrainingSection(context),
-          SizedBox(height: 44.v),
-
-          _buildTrainingList(context),
-          // _noData()
+          _buildTrainingSection(balance),
+          SizedBox(height: 24.v),
+          _buildDayFilterPanel(),
+          SizedBox(height: 24.v),
+          MainRepository.isTimerActive
+              ? _buildTrainingList(trainings)
+              : _noData()
         ],
       ),
     );
   }
 
-  /// Section Widget
-  Widget _buildTrainingList(BuildContext context) {
+  Widget _buildTrainingList(List<TrainingModel> trainings) {
+    final filteredTrainings = trainings
+        .where((e) =>
+            (_selectedDayType == DayType.all) ||
+            (e.date.weekday == _selectedDayType.index))
+        .toList();
+
     return SizedBox(
       width: double.maxFinite,
       child: ListView.separated(
@@ -136,9 +196,11 @@ class HomeScreen extends StatelessWidget {
             height: 10.v,
           );
         },
-        itemCount: 2,
+        itemCount: filteredTrainings.length,
         itemBuilder: (context, index) {
-          return TraininglistItemWidget();
+          return TrainingItemWidget(
+            training: filteredTrainings[index],
+          );
         },
       ),
     );
@@ -159,93 +221,70 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
-  Widget _buildTabview(BuildContext context) {
+  Widget _buildDayFilterPanel() {
     return Container(
-      height: 40.v,
-      margin: EdgeInsets.only(left: 16.h),
-      child: TabBar(
-        //TODO
-        // controller: tabviewController,
-        isScrollable: true,
-        labelColor: appTheme.gray50,
-        labelStyle: TextStyle(
-          fontSize: 12.fSize,
-          fontFamily: 'Kharkiv Tone',
-          fontWeight: FontWeight.w400,
-        ),
-        unselectedLabelColor: theme.colorScheme.onPrimary.withOpacity(1),
-        unselectedLabelStyle: TextStyle(
-          fontSize: 12.fSize,
-          fontFamily: 'Kharkiv Tone',
-          fontWeight: FontWeight.w400,
-        ),
-        indicatorSize: TabBarIndicatorSize.tab,
-        indicator: BoxDecoration(
-          color: theme.colorScheme.onPrimaryContainer,
-          borderRadius: BorderRadius.circular(
-            16.h,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: appTheme.black90026,
-              spreadRadius: 2.h,
-              blurRadius: 2.h,
-              offset: Offset(
-                0,
-                0,
-              ),
-            )
-          ],
-        ),
-        dividerHeight: 0.0,
-        tabs: [
-          Tab(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 24.h,
-                vertical: 12.v,
-              ),
-              child: Text(
-                "All",
-              ),
-            ),
-          ),
-          Tab(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 24.h,
-                vertical: 12.v,
-              ),
-              child: Text(
-                "Monday",
-              ),
-            ),
-          ),
-          Tab(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 24.h,
-                vertical: 12.v,
-              ),
-              child: Text(
-                "Wednesday",
-              ),
-            ),
-          ),
-          Tab(
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 24.h,
-                vertical: 12.v,
-              ),
-              child: Text(
-                "Friday",
-              ),
-            ),
-          )
-        ],
-      ),
+      height: 55.h,
+      margin: EdgeInsets.symmetric(horizontal: 8.v),
+      child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          itemCount: _scheduledDays.length,
+          separatorBuilder: (context, index) => SizedBox(width: 8.h),
+          itemBuilder: (context, index) {
+            final dayType = _scheduledDays[index];
+            return DayTypeWidget(
+              dayType: dayType,
+              isSelected: _selectedDayType == dayType,
+              onSelected: () {
+                if (_selectedDayType != dayType) {
+                  setState(() => _selectedDayType = dayType);
+                }
+              },
+            );
+          }),
     );
+  }
+
+  void _startTimer() {
+    setState(() {
+      _isRunning = true;
+    });
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        _seconds++;
+      });
+    });
+  }
+
+  void _resetTimer() {
+    if (_seconds >= 60) {
+      TrainingModel training = TrainingModel(
+        date: DateTime.now(),
+        duration: Duration(seconds: _seconds),
+      );
+      MainRepository.addTraining(training);
+    }
+
+    _timer?.cancel();
+    setState(() {
+      _seconds = 0;
+      _isRunning = false;
+    });
+  }
+
+  void _handleTimerTap() {
+    if (MainRepository.isTimerActive) {
+      _isRunning ? _resetTimer() : _startTimer();
+    } else
+      showDialog<String>(
+        context: context,
+        builder: (_) => const SelectDaysDialog(),
+      );
+  }
+
+  String _formatTime(int seconds) {
+    int hours = seconds ~/ 3600;
+    int minutes = (seconds % 3600) ~/ 60;
+    int secs = seconds % 60;
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 }

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 
 class AppbarSubtitle extends StatelessWidget {
-  AppbarSubtitle({Key? key, required this.text, this.margin, this.onTap})
-      : super(
-          key: key,
-        );
+  AppbarSubtitle({
+    Key? key,
+    required this.text,
+    this.margin,
+    this.onTap,
+  }) : super(key: key);
 
   final String text;
 
@@ -16,9 +18,11 @@ class AppbarSubtitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        onTap?.call();
-      },
+      onTap: () => Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.homeScreen,
+        (route) => false,
+      ),
       child: Padding(
         padding: margin ?? EdgeInsets.zero,
         child: Text(

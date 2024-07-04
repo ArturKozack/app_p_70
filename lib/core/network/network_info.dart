@@ -1,6 +1,6 @@
+import 'package:app_p_70/core/repositories.dart/main_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:app_p_70/main.dart';
 
 // For checking internet connectivity
 abstract class NetworkInfoI {
@@ -68,8 +68,8 @@ class NoInternetException implements Exception {
   late String _message;
 
   NoInternetException([String message = 'NoInternetException Occurred']) {
-    if (globalMessengerKey.currentState != null) {
-      globalMessengerKey.currentState!
+    if (MainRepository.globalMessengerKey.currentState != null) {
+      MainRepository.globalMessengerKey.currentState!
           .showSnackBar(SnackBar(content: Text(message)));
     }
     this._message = message;

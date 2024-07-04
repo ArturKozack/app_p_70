@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import '../../core/app_export.dart';
 
 class AppbarTrailingImage extends StatelessWidget {
-  AppbarTrailingImage({Key? key, this.imagePath, this.margin, this.onTap})
-      : super(
-          key: key,
-        );
+  AppbarTrailingImage({
+    Key? key,
+    this.imagePath,
+    this.margin,
+    this.onTap,
+  }) : super(key: key);
 
   final String? imagePath;
-
   final EdgeInsetsGeometry? margin;
-
   final Function? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return GestureDetector(
       onTap: () {
         onTap?.call();
       },

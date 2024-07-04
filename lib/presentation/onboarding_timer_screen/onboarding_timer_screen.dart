@@ -1,15 +1,33 @@
+import 'package:app_p_70/core/models/day_type/day_type.dart';
+import 'package:app_p_70/core/models/schedule/schedule.dart';
+import 'package:app_p_70/core/repositories.dart/main_repository.dart';
+import 'package:app_p_70/presentation/widgets/app_button.dart';
 import 'package:flutter/material.dart';
-import '../../core/app_export.dart';
-import '../../widgets/app_bar/appbar_subtitle.dart';
-import '../../widgets/app_bar/custom_app_bar.dart';
-import '../../widgets/custom_icon_button.dart';
-import 'widgets/daysofthe_item_widget.dart';
+import 'package:app_p_70/core/app_export.dart';
+import 'package:app_p_70/widgets/app_bar/appbar_subtitle.dart';
+import 'package:app_p_70/widgets/app_bar/custom_app_bar.dart';
+import 'widgets/day_item_widget.dart';
 
-class OnboardingTimerScreen extends StatelessWidget {
-  const OnboardingTimerScreen({Key? key})
-      : super(
-          key: key,
-        );
+class OnboardingTimerScreen extends StatefulWidget {
+  const OnboardingTimerScreen({Key? key}) : super(key: key);
+
+  @override
+  State<OnboardingTimerScreen> createState() => _OnboardingTimerScreenState();
+}
+
+class _OnboardingTimerScreenState extends State<OnboardingTimerScreen> {
+  final _hoursController = TextEditingController();
+  final _minutesController = TextEditingController();
+
+  final List<DayType> _selectedDays = [];
+  TimeOfDay _selectedTime = TimeOfDay(hour: 0, minute: 0);
+
+  @override
+  void dispose() {
+    _hoursController.dispose();
+    _minutesController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,14 +42,15 @@ class OnboardingTimerScreen extends StatelessWidget {
             vertical: 30.v,
           ),
           child: Column(
-            children: [_buildTitleColumn(context), SizedBox(height: 4.v)],
+            children: [
+              _buildBody(context),
+            ],
           ),
         ),
       ),
     );
   }
 
-  /// Section Widget
   PreferredSizeWidget _buildAppbarSection(BuildContext context) {
     return CustomAppBar(
       height: 90.v,
@@ -48,8 +67,7 @@ class OnboardingTimerScreen extends StatelessWidget {
     );
   }
 
-  /// Section Widget
-  Widget _buildOnboardingCard(BuildContext context) {
+  Widget _buildBody(BuildContext context) {
     return Expanded(
       child: Column(
         children: [
@@ -70,14 +88,38 @@ class OnboardingTimerScreen extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 6.v),
+          SizedBox(height: 8.v),
           SizedBox(
             width: double.maxFinite,
             child: Wrap(
               runSpacing: 10.v,
               spacing: 10.h,
-              children:
-                  List<Widget>.generate(8, (index) => DaysoftheItemWidget()),
+              alignment: WrapAlignment.center,
+              children: List<Widget>.generate(
+                DayType.values.length,
+                (index) {
+                  final dayType = DayType.values[index];
+                  return DayTypeWidget(
+                    dayType: dayType,
+                    isSelected: _selectedDays.contains(dayType),
+                    onSelected: () {
+                      setState(
+                        () {
+                          if (_selectedDays.contains(dayType)) {
+                            _selectedDays.remove(dayType);
+                          } else {
+                            if (dayType == DayType.all ||
+                                _selectedDays.contains(DayType.all)) {
+                              _selectedDays.clear();
+                            }
+                            _selectedDays.add(dayType);
+                          }
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ),
           SizedBox(height: 34.v),
@@ -93,60 +135,125 @@ class OnboardingTimerScreen extends StatelessWidget {
               ),
             ),
           ),
+          SizedBox(height: 8.v),
+          _buildTimeInputWidget(),
           Spacer(),
-          SizedBox(
-            height: 50.v,
-            width: double.maxFinite,
-            child: Stack(
-              alignment: Alignment.center,
-              children: [
-                CustomImageView(
-                  imagePath: ImageConstant.imgUnionPrimary,
-                  height: 50.v,
-                  width: double.maxFinite,
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4.h),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: 124.h,
-                          top: 8.v,
-                        ),
-                        child: Text(
-                          "Next",
-                          style: CustomTextStyles.bodyLargeGray50,
-                        ),
-                      ),
-                      CustomIconButton(
-                        height: 40.adaptSize,
-                        width: 40.adaptSize,
-                        padding: EdgeInsets.all(8.h),
-                        alignment: Alignment.center,
-                        child: CustomImageView(
-                          imagePath: ImageConstant.imgNorthEast,
-                        ),
-                      )
-                    ],
-                  ),
-                )
-              ],
-            ),
-          )
+          AppButton(
+            isActive: _selectedDays.isNotEmpty,
+            onTap: () {
+              if (_selectedDays.isNotEmpty) {
+                if (_selectedDays.contains(DayType.all)) {
+                  _selectedDays.clear();
+                  _selectedDays.addAll(DayType.values);
+                } else {
+                  _selectedDays.sort((a, b) => a.index.compareTo(b.index));
+                }
+                final schedule = ScheduleModel(
+                  days: _selectedDays,
+                  startDate: DateTime.now(),
+                );
+                MainRepository.changeSchedule(schedule);
+                Navigator.pushNamedAndRemoveUntil(
+                  context,
+                  AppRoutes.homeScreen,
+                  (route) => false,
+                );
+              }
+            },
+          ),
         ],
       ),
     );
   }
 
-  /// Section Widget
-  Widget _buildTitleColumn(BuildContext context) {
-    return Expanded(
-      child: Column(
-        children: [_buildOnboardingCard(context)],
+  Widget _buildTimeInputWidget() {
+    return GestureDetector(
+      onTap: () {
+        showTimePicker(
+          initialTime: TimeOfDay.now(),
+          context: context,
+        ).then((value) {
+          setState(() {
+            if (value != null) {
+              _selectedTime = value;
+              _hoursController.text = _selectedTime.hour.toString();
+              _minutesController.text = _selectedTime.minute.toString();
+            }
+          });
+        });
+      },
+      child: Container(
+        padding: EdgeInsets.symmetric(
+          vertical: 24.v,
+          horizontal: 24.h,
+        ),
+        decoration: BoxDecoration(
+          color: appTheme.whiteA700,
+          border: Border.all(
+            color: appTheme.gray300,
+          ),
+          borderRadius: BorderRadius.circular(28),
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: _buildTimeInputField(
+                _hoursController,
+                'hours',
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(10.h, 0, 10.v, 28.v),
+              child: Text(
+                ':',
+                style: TextStyle(fontSize: 36),
+              ),
+            ),
+            Expanded(
+              child: _buildTimeInputField(
+                _minutesController,
+                'minutes',
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildTimeInputField(
+    TextEditingController controller,
+    String hint,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          enabled: false,
+          controller: controller,
+          style: theme.textTheme.displaySmall,
+          textAlign: TextAlign.center,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: appTheme.gray5001,
+            hintText: '00',
+            hintStyle: theme.textTheme.displaySmall,
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(
+                color: Colors.transparent,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 4.v,
+        ),
+        Text(
+          hint,
+          style: theme.textTheme.bodySmall,
+        ),
+      ],
     );
   }
 }
