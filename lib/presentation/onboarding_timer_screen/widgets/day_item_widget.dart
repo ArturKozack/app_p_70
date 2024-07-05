@@ -18,6 +18,7 @@ class DayTypeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      height: 50.h,
       padding: EdgeInsets.all(4),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(32.0),

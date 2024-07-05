@@ -235,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildDayFilterPanel() {
     return Container(
-      height: 30.h,
+      height: 50.h,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: _scheduledDays.length,
