@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:app_p_70/core/models/schedule/schedule.dart';
 import 'package:app_p_70/core/models/training/training.dart';
-import 'package:app_p_70/core/utils/app_strings.dart';
 import 'package:app_p_70/core/utils/date_time_utils.dart';
 import 'package:app_p_70/presentation/clear_data_dialog/clear_data_dialog.dart';
 import 'package:app_p_70/routes/app_routes.dart';
@@ -52,20 +51,17 @@ class MainRepository {
     return isTrainingMissed;
   }
 
-  static bool checkForTodayTraining() {
+  static Duration? delayForTodayTrainingDialog() {
     if (schedule != null && isTimerActive) {
-      final DateTime now = DateTime.now().onlyDate;
+      final DateTime now = DateTime.now();
       final scheduledDaysIndexes = schedule!.days.map((e) => e.index);
       if (scheduledDaysIndexes.contains(now.day)) {
-        if (trainings.isEmpty)
-          return true;
-        else {
-          final DateTime lastDate = trainings.last.date.onlyDate;
-          return !lastDate.isAtSameMomentAs(lastDate);
-        }
+        final Duration delay =
+            schedule!.startDate.subtract(Duration(minutes: 10)).difference(now);
+        return delay;
       }
     }
-    return false;
+    return null;
   }
 
   static void changeSchedule(ScheduleModel schedule) {
@@ -77,7 +73,7 @@ class MainRepository {
   static void addTraining(TrainingModel training) async {
     trainingsBox
         .add(training)
-        .then((_) => showSuccessSnackbar(AppStrings.trainingSavedSuccessfully))
+        .then((_) => showSuccessSnackbar())
         .onError((error, stackTrace) => showErrorSnackbar());
   }
 
@@ -87,7 +83,7 @@ class MainRepository {
       builder: (_) => const ClearDataDialog(),
     ).then(
       (value) async {
-        if (value != null && value == AppStrings.delete) {
+        if (value != null && value == 'delete') {
           Navigator.pushNamedAndRemoveUntil(
             context,
             AppRoutes.onboardingScreen,
@@ -112,9 +108,12 @@ class MainRepository {
     }
   }
 
-  static void showSuccessSnackbar(String message) =>
-      snackbarKey.currentState!.showSnackBar(CustomSnackBar.success(message));
+  static void showSuccessSnackbar() =>
+      snackbarKey.currentState!.showSnackBar(CustomSnackBar.success());
 
   static void showErrorSnackbar() =>
       snackbarKey.currentState!.showSnackBar(CustomSnackBar.error());
+
+  static void showTrainingWarningSnackbar() =>
+      snackbarKey.currentState!.showSnackBar(CustomSnackBar.trainingWarning());
 }

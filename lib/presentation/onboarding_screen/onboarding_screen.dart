@@ -53,7 +53,7 @@ class OnboardingScreen extends StatelessWidget {
             localizations.trainingCredit,
             style: theme.textTheme.displaySmall,
           ),
-          SizedBox(height: 22.v),
+          SizedBox(height: 24.v),
           SizedBox(
             width: double.maxFinite,
             child: Text(
@@ -66,13 +66,16 @@ class OnboardingScreen extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 22.v),
-          CustomImageView(
-            imagePath: ImageConstant.imgImage,
-            height: 398.v,
-            width: double.maxFinite,
+          SizedBox(height: 24.v),
+          Expanded(
+            child: CustomImageView(
+              imagePath: ImageConstant.imgImage,
+              height: 398.v,
+              width: double.maxFinite,
+              fit: BoxFit.scaleDown,
+            ),
           ),
-          SizedBox(height: 22.v),
+          SizedBox(height: 24.v),
           AppButton(
             title: localizations.next,
             onTap: () =>

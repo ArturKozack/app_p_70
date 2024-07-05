@@ -1,4 +1,3 @@
-import 'package:app_p_70/core/utils/app_strings.dart';
 import 'package:app_p_70/core/repositories.dart/main_repository.dart';
 import 'package:app_p_70/presentation/settings_screen/info_screen.dart';
 import 'package:flutter/material.dart';
@@ -33,11 +32,14 @@ extension SettingsItemValue on SettingsItemType {
   }
 
   String get description {
+    final context = MainRepository.snackbarKey.currentContext!;
+    final localizations = AppLocalizations.of(context)!;
+
     switch (this) {
       case SettingsItemType.privacyPolicy:
-        return AppStrings.loremIpsum;
+        return localizations.loremIpsum;
       case SettingsItemType.termsOfUse:
-        return AppStrings.loremIpsum;
+        return localizations.loremIpsum;
       default:
         return '';
     }

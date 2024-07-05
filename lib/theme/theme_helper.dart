@@ -47,6 +47,18 @@ class ThemeHelper {
           padding: EdgeInsets.zero,
         ),
       ),
+      timePickerTheme: TimePickerThemeData(
+        hourMinuteColor: WidgetStateColor.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? colorScheme.onPrimaryContainer
+              : colorScheme.surface,
+        ),
+        hourMinuteTextColor: WidgetStateColor.resolveWith(
+          (states) => states.contains(WidgetState.selected)
+              ? appTheme.whiteA700
+              : appTheme.black900,
+        ),
+      ),
     );
   }
 

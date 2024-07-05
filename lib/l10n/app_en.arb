@@ -32,5 +32,9 @@
   "thursday": "thursday",
   "friday": "friday",
   "saturday": "saturday",
-  "sunday": "sunday"
+  "sunday": "sunday",
+  "trainingDurationWarning": "The time is less than allowed.  1 minute of your training = 1 point.",
+  "errorOccured": "An error occurred. Please try again",
+  "trainingSavedSuccessfully": "Training saved successfully",
+  "loremIpsum": "Lorem ipsum dolor sit amet consectetur. Sit arcu nulla cursus enim consectetur sit rutrum. Id tincidunt tincidunt tortor vulputate pretium viverra. Turpis mi commodo pellentesque interdum consectetur sollicitudin sed at vel. Odio ullamcorper aliquam urna magna lacus in magna felis odio. \n\nLorem ipsum dolor sit amet consectetur. Sit arcu nulla cursus enim consectetur sit rutrum. Id tincidunt tincidunt tortor vulputate pretium viverra. Turpis mi commodo pellentesque interdum consectetur sollicitudin sed at vel. Odio ullamcorper aliquam urna magna lacus in magna felis odio."
 }

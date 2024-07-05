@@ -1,13 +1,13 @@
 import 'package:app_p_70/core/models/day_type/day_type.dart';
 import 'package:app_p_70/core/models/training/training.dart';
 import 'package:app_p_70/core/repositories.dart/main_repository.dart';
+import 'package:app_p_70/presentation/home_screen/widgets/custom_painter.dart';
 import 'package:app_p_70/presentation/home_screen/widgets/training_item_widget.dart';
 import 'package:app_p_70/presentation/missed_workout_dialog/missed_workout_dialog.dart';
 import 'package:app_p_70/presentation/onboarding_timer_screen/widgets/day_item_widget.dart';
 import 'package:app_p_70/presentation/select_days_dialog/select_days_dialog.dart';
 import 'package:app_p_70/presentation/start_training_dialog/start_training_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg_provider/flutter_svg_provider.dart' as fs;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:app_p_70/core/app_export.dart';
 import 'package:app_p_70/widgets/app_bar/appbar_title.dart';
@@ -16,7 +16,6 @@ import 'package:app_p_70/widgets/app_bar/custom_app_bar.dart';
 import 'package:app_p_70/widgets/custom_elevated_button.dart';
 import 'package:app_p_70/widgets/custom_icon_button.dart';
 import 'dart:async';
-
 import 'package:hive_flutter/hive_flutter.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -39,25 +38,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     bool isTrainingMissed = MainRepository.checkForMissedTrainings();
-    bool isUnfinishedTrainingToday = MainRepository.checkForTodayTraining();
-
-    if (isTrainingMissed || isUnfinishedTrainingToday) {
+    if (isTrainingMissed) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (isTrainingMissed)
           showDialog<String>(
             context: context,
             builder: (_) => const MissedWorkoutDialog(),
           );
-        if (isUnfinishedTrainingToday)
-          showDialog<String>(
-            context: context,
-            builder: (_) => StartTrainingDialog(
-              onStartTraining: _handleTimerTap,
-            ),
-          );
       });
     }
-
+    _scheduleTodayTrainingDialog();
     if (_scheduledDays.isNotEmpty && !_scheduledDays.contains(DayType.all))
       _scheduledDays.insert(0, DayType.all);
     super.initState();
@@ -114,19 +104,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildTrainingSection(int balance) {
+    final width = MediaQuery.sizeOf(context).width - 40;
+    final height = (width * 0.7552631578947369).toDouble();
+
     return Container(
-      width: 380.h,
-      height: 278.v,
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: fs.Svg(
-            ImageConstant.imgGroup12,
-            size: Size(380.h, 278.v),
-          ),
-        ),
-      ),
+      width: width,
+      height: height,
       child: Stack(
         children: [
+          CustomPaint(
+            size: Size(width, height),
+            painter: RPSCustomPainter(),
+          ),
           Column(
             children: [
               SizedBox(height: 14.v),
@@ -134,12 +123,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 text: localizations.trainingCredit,
                 margin: EdgeInsets.symmetric(horizontal: 24.h),
               ),
-              SizedBox(height: 48.v),
+              const Spacer(),
               Text(
                 _formatTime(_seconds),
                 style: theme.textTheme.displayLarge,
               ),
-              SizedBox(height: 48.v),
+              const Spacer(),
               Container(
                 width: double.maxFinite,
                 margin: EdgeInsets.only(left: 24.h),
@@ -153,7 +142,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ],
                 ),
-              )
+              ),
+              SizedBox(height: 20.v),
             ],
           ),
           Positioned(
@@ -161,8 +151,8 @@ class _HomeScreenState extends State<HomeScreen> {
             bottom: 1,
             child: CustomIconButton(
               onTap: _handleTimerTap,
-              height: 74.adaptSize,
-              width: 74.adaptSize,
+              height: 74.h,
+              width: 74.h,
               padding: EdgeInsets.all(16.h),
               decoration: MainRepository.isTimerActive
                   ? IconButtonStyleHelper.fillOnActive
@@ -245,24 +235,40 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildDayFilterPanel() {
     return Container(
-      height: 55.h,
-      margin: EdgeInsets.symmetric(horizontal: 8.v),
+      height: 30.h,
       child: ListView.separated(
-          scrollDirection: Axis.horizontal,
-          itemCount: _scheduledDays.length,
-          separatorBuilder: (context, index) => SizedBox(width: 8.h),
-          itemBuilder: (context, index) {
-            final dayType = _scheduledDays[index];
-            return DayTypeWidget(
-              dayType: dayType,
-              isSelected: _selectedDayType == dayType,
-              onSelected: () {
-                if (_selectedDayType != dayType) {
-                  setState(() => _selectedDayType = dayType);
-                }
-              },
-            );
-          }),
+        scrollDirection: Axis.horizontal,
+        itemCount: _scheduledDays.length,
+        separatorBuilder: (context, index) => SizedBox(width: 8.h),
+        itemBuilder: (context, index) {
+          final dayType = _scheduledDays[index];
+          return DayTypeWidget(
+            dayType: dayType,
+            isSelected: _selectedDayType == dayType,
+            onSelected: () {
+              if (_selectedDayType != dayType) {
+                setState(() => _selectedDayType = dayType);
+              }
+            },
+          );
+        },
+      ),
+    );
+  }
+
+  void _scheduleTodayTrainingDialog() {
+    final Duration? delay = MainRepository.delayForTodayTrainingDialog();
+    if (delay == null || delay.isNegative) return;
+    Timer(
+      delay,
+      () {
+        showDialog<String>(
+          context: context,
+          builder: (_) => StartTrainingDialog(
+            onStartTraining: _handleTimerTap,
+          ),
+        );
+      },
     );
   }
 
@@ -284,6 +290,8 @@ class _HomeScreenState extends State<HomeScreen> {
         duration: Duration(seconds: _seconds),
       );
       MainRepository.addTraining(training);
+    } else {
+      MainRepository.showTrainingWarningSnackbar();
     }
 
     _timer?.cancel();

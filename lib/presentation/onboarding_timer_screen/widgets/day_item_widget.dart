@@ -17,41 +17,52 @@ class DayTypeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RawChip(
-      padding: EdgeInsets.symmetric(
-        horizontal: 24.h,
-        vertical: 12.v,
+    return Container(
+      padding: EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(32.0),
+        boxShadow: [
+          BoxShadow(
+            color: appTheme.black900.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 6,
+          ),
+        ],
       ),
-      showCheckmark: false,
-      labelPadding: EdgeInsets.zero,
-      label: Text(
-        dayType.title.capitalized,
-        style: TextStyle(
-          color: isSelected
-              ? appTheme.whiteA700
-              : theme.colorScheme.onPrimary.withOpacity(1),
-          fontSize: 12.fSize,
-          fontFamily: 'Kharkiv Tone',
-          fontWeight: FontWeight.w400,
+      child: RawChip(
+        padding: EdgeInsets.symmetric(
+          horizontal: 24.h,
+          vertical: 12.v,
         ),
+        showCheckmark: false,
+        labelPadding: EdgeInsets.zero,
+        label: Text(
+          dayType.title.capitalized,
+          style: TextStyle(
+            color: isSelected
+                ? appTheme.whiteA700
+                : theme.colorScheme.onPrimary.withOpacity(1),
+            fontSize: 12.fSize,
+            fontFamily: 'Kharkiv Tone',
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+        selected: isSelected,
+        backgroundColor: appTheme.gray5001,
+        selectedColor: theme.colorScheme.onPrimaryContainer,
+        shape: RoundedRectangleBorder(
+          side: BorderSide(
+            color: isSelected
+                ? theme.colorScheme.onPrimaryContainer
+                : appTheme.gray5001,
+            width: 0,
+          ),
+          borderRadius: BorderRadius.circular(
+            16.h,
+          ),
+        ),
+        onSelected: (value) => onSelected(),
       ),
-      selected: isSelected,
-      backgroundColor: appTheme.whiteA700,
-      shadowColor: appTheme.black90026,
-      elevation: 2,
-      selectedColor: theme.colorScheme.onPrimaryContainer,
-      shape: RoundedRectangleBorder(
-        side: BorderSide(
-          color: isSelected
-              ? theme.colorScheme.onPrimaryContainer
-              : appTheme.gray5001,
-          width: 0,
-        ),
-        borderRadius: BorderRadius.circular(
-          16.h,
-        ),
-      ),
-      onSelected: (value) => onSelected(),
     );
   }
 }

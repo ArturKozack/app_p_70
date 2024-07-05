@@ -1,4 +1,3 @@
-import 'package:app_p_70/core/utils/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:app_p_70/core/app_export.dart';
@@ -37,14 +36,14 @@ class ClearDataDialog extends StatelessWidget {
       actionsAlignment: MainAxisAlignment.end,
       actions: [
         InkWell(
-          onTap: () => Navigator.pop(context, AppStrings.cancel),
+          onTap: () => Navigator.pop(context, 'cancel'),
           child: Text(
             localizations.cancel,
             style: theme.textTheme.bodyLarge,
           ),
         ),
         InkWell(
-          onTap: () => Navigator.pop(context, AppStrings.delete),
+          onTap: () => Navigator.pop(context, 'delete'),
           child: Padding(
             padding: EdgeInsets.only(left: 32.h),
             child: Text(

@@ -25,8 +25,6 @@ class ImageConstant {
 
   static String imgBasicSettings = '$imagePath/img_basic_settings.svg';
 
-  static String imgGroup12 = '$imagePath/img_group_12.svg';
-
   static String imgPlayCircle = '$imagePath/img_play_circle.svg';
 
   static String imgPauseCircle = '$imagePath/img_pause_circle.svg';
